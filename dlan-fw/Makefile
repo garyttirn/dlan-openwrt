@@ -8,7 +8,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dlan-fw
-PKG_VERSION:=1.0-c
+PKG_VERSION:=1.1
 PKG_RELEASE:=1
 
 PKG_LICENSE:=devolo QCA

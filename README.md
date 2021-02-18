@@ -11,7 +11,7 @@ This repository is intended to be layered on-top of an OpenWrt buildroot. If you
 
 To add it to the buildroot add the following line to feeds.conf.default (or feeds.conf if it exists):
 ```
-src-git dlan https://github.com/devolo/dlan-openwrt.git
+src-git dlan https://github.com/0xFelix/dlan-openwrt.git
 ```
 
 To install all its package definitions, run:

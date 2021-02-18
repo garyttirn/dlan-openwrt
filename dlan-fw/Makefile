@@ -54,34 +54,10 @@ define Package/dlan-plc/install
 	$(INSTALL_BIN) files/usr/sbin/* $(1)/usr/sbin
 endef
 
-define Package/$(PKG_NAME)-hotspot
-  $(call Package/$(PKG_NAME)/Default)
-  TITLE += dLAN Hotspot
-  FW_TARGET:=dlan-hotspot
-  FW_HOSTTOOL:=plchost
-  DEPENDS+=+open-plc-utils-$$(FW_HOSTTOOL)
-endef
-
-define Package/$(PKG_NAME)-pro-500-wp
-  $(call Package/$(PKG_NAME)/Default)
-  TITLE += dLAN pro 500 Wireless+
-  FW_TARGET:=dlan-pro-500-wp
-  FW_HOSTTOOL:=amphost
-  DEPENDS+=+open-plc-utils-$$(FW_HOSTTOOL)
-endef
-
 define Package/$(PKG_NAME)-pro-1200-ac
   $(call Package/$(PKG_NAME)/Default)
   TITLE += dLAN pro 1200+ WiFi ac
-  FW_TARGET:=dlan-pro-1200-ac
-  FW_HOSTTOOL:=plchost
-  DEPENDS+=+open-plc-utils-$$(FW_HOSTTOOL)
-endef
-
-define Package/$(PKG_NAME)-pro-1200-n
-  $(call Package/$(PKG_NAME)/Default)
-  TITLE += dLAN pro 1200+ WiFi n
-  FW_TARGET:=dlan-pro-1200-n
+  FW_TARGET:=devolo,dlan-pro-1200-ac
   FW_HOSTTOOL:=plchost
   DEPENDS+=+open-plc-utils-$$(FW_HOSTTOOL)
 endef
@@ -105,10 +81,7 @@ endif
 	echo "PLCFW_SCHEMES=\$$$$PLCFW_PATH/$(FW_TARGET)" >>$(1)/lib/firmware/plc/$(FW_TARGET)/fwconfig
 endef
 
-Package/$(PKG_NAME)-hotspot/install = $(InstallFirmware)
-Package/$(PKG_NAME)-pro-500-wp/install = $(InstallFirmware)
 Package/$(PKG_NAME)-pro-1200-ac/install = $(InstallFirmware)
-Package/$(PKG_NAME)-pro-1200-n/install = $(InstallFirmware)
 
 define Build/Compile
 endef
@@ -117,7 +90,4 @@ define Build/Install
 endef
 
 $(eval $(call BuildPackage,dlan-plc))
-$(eval $(call BuildPackage,$(PKG_NAME)-hotspot))
-$(eval $(call BuildPackage,$(PKG_NAME)-pro-500-wp))
 $(eval $(call BuildPackage,$(PKG_NAME)-pro-1200-ac))
-$(eval $(call BuildPackage,$(PKG_NAME)-pro-1200-n))

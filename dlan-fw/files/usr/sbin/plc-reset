@@ -2,28 +2,10 @@
 
 . /lib/functions.sh
 
-type -t board_name >/dev/null || {
-	# for old OpenWrt without generic board_name function
-	. /lib/ar71xx.sh
-	board_name() ar71xx_board_name
-}
 board=$(board_name)
 
 case "$board" in
-dlan-hotspot)
-	echo 0 > /sys/class/gpio/gpio20/value
-	sleep 1
-	echo 1 > /sys/class/gpio/gpio20/value
-	;;
-
-dlan-pro-500-wp)
-	echo 0 > /sys/class/gpio/gpio13/value
-	sleep 1
-	echo 1 > /sys/class/gpio/gpio13/value
-	;;
-
-dlan-pro-1200-ac|\
-dlan-pro-1200-n)
+devolo,dlan-pro-1200-ac)
 	echo 0 > /sys/class/gpio/gpio13/value
 	sleep 1
 	echo 1 > /sys/class/gpio/gpio13/value

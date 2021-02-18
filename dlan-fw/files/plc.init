@@ -9,11 +9,6 @@ USE_PROCD=1
 . /lib/functions/system.sh
 . /lib/functions/leds.sh
 
-type -t board_name >/dev/null || {
-	# for old OpenWrt without generic board_name function
-	. /lib/ar71xx.sh
-	board_name() ar71xx_board_name
-}
 board=$(board_name)
 
 . /lib/firmware/plc/$board/fwconfig
@@ -104,11 +99,7 @@ set_mac_address()
 
     if [ -z "$plc_mac" ] ; then
         local base_mac=$(mtd_get_mac_binary art 4098 2>/dev/null)
-        if [ "$board" = "dlan-pro-1200-n" ]; then
-            plc_mac=$(macaddr_add $base_mac 2)
-        else
-            plc_mac=$(macaddr_add $base_mac 3)
-        fi
+        plc_mac=$(macaddr_add $base_mac 3)
     fi
     if [ -n "$plc_mac" ] ; then
         /usr/bin/modpib -M $(macaddr_canonicalize $plc_mac) "$1"
@@ -133,22 +124,9 @@ set_user_pib()
 do_gpios()
 {
     case "$board" in
-    dlan-hotspot)
-	echo 1 > /sys/class/gpio/gpio18/value
-	echo 1 > /sys/class/gpio/gpio22/value
-	sleep 1
-	echo 1 > /sys/class/gpio/gpio20/value
-	;;
-
-    dlan-pro-500-wp)
-	echo 1 > /sys/class/gpio/gpio17/value
+    devolo,dlan-pro-1200-ac)
 	echo 1 > /sys/class/gpio/gpio13/value
-	;;
-
-    dlan-pro-1200-ac|\
-    dlan-pro-1200-n)
-	echo 1 > /sys/class/gpio/gpio13/value
-	led_set_attr "devolo:status:dlan" inverted 1
+	led_set_attr "white:dlan" inverted 1
 	;;
     esac
 	sleep 1
@@ -221,20 +199,11 @@ activate() {
 stop_service() {
     logger "stop PLC"
     case "$board" in
-    dlan-hotspot)
-	echo 0 > /sys/class/gpio/gpio20/value
-	;;
-
-    dlan-pro-500-wp)
-	echo 0 > /sys/class/gpio/gpio13/value
-	;;
-
-    dlan-pro-1200-ac|\
-    dlan-pro-1200-n)
+    devolo,dlan-pro-1200-ac)
 	# reinstall normal led trigger potentially messed up by standby
 	( . /etc/init.d/led && config_load system && load_led led_plcw )
 	echo 0 > /sys/class/gpio/gpio13/value
-	led_set_attr "devolo:status:dlan" inverted 0
+	led_set_attr "white:dlan" inverted 0
 	;;
     esac
     reset_ebtables
@@ -294,15 +263,14 @@ standby() {
     [ $STANDBY = '0' ] && return
 
     case "$board" in
-    dlan-pro-1200-ac|\
-    dlan-pro-1200-n)
+    devolo,dlan-pro-1200-ac)
         # LED scheme 2014
         [ "$LED_SCHEME" = "on" ] && {
             led_timer "$(uci_get system led_plcw sysfs)" 500 59500
         }
         # standby on
         echo 0 > /sys/class/gpio/gpio13/value
-        led_set_attr "devolo:status:dlan" inverted 0
+        led_set_attr "white:dlan" inverted 0
         ;;
     esac
 }
@@ -313,15 +281,14 @@ normal() {
     [ $STANDBY = '0' ] && return
 
     case "$board" in
-    dlan-pro-1200-ac|\
-    dlan-pro-1200-n)
+    devolo,dlan-pro-1200-ac)
         # LED scheme 2014
         [ "$LED_SCHEME" = "on" ] && {
             ( . /etc/init.d/led && config_load system && load_led led_plcw )
         }
         # standby off
         echo 1 > /sys/class/gpio/gpio13/value
-        led_set_attr "devolo:status:dlan" inverted 1
+        led_set_attr "white:dlan" inverted 1
         ;;
     esac
 }

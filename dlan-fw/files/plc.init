@@ -174,14 +174,10 @@ activate() {
         logger "activate PLC Modem"
         do_gpios
         procd_open_instance
-        # run ***host - if it terminates try to save user.pib.tmp if it checks out
-        # procd needs setsid to not kill the init process in trap context
-        procd_set_param command setsid sh -c "
-                trap \"trap - TERM; kill 0; exit\" TERM
-                \"$PLCFW_HOST\" -i \"$PLCIF\" -N \"$NVM\" -P \"$PIB\" -n \"$PLCFW_PATH/user.nvm.tmp\" -p \"$PLCFW_PATH/user.pib.tmp\" &
-                wait \$!
-                chkpib -q /lib/firmware/plc/user.pib.tmp && mv /lib/firmware/plc/user.pib.tmp /lib/firmware/plc/user.pib
-                exit"
+        # run ***host - if $PLCFW_PATH/user.pib.tmp is changed, reload_service() via stop_service() will try to save user.pib.tmp if it checks out
+        procd_set_param command $PLCFW_HOST
+        procd_append_param command -i $PLCIF -N $NVM -P $PIB -n $PLCFW_PATH/user.nvm.tmp -p $PLCFW_PATH/user.pib.tmp
+        procd_set_param file $PLCFW_PATH/user.pib.tmp
         procd_set_param respawn 3600 5 0
         # output to logd
         procd_set_param stdout 1
@@ -200,6 +196,9 @@ stop_service() {
     logger "stop PLC"
     case "$board" in
     devolo,dlan-pro-1200-ac)
+        # try to save user.pib.tmp if it checks out
+        chkpib -q $PLCFW_PATH/user.pib.tmp && mv $PLCFW_PATH/user.pib.tmp $PLCFW_PATH//user.pib
+
 	# reinstall normal led trigger potentially messed up by standby
 	( . /etc/init.d/led && config_load system && load_led led_plcw )
 	echo 0 > /sys/class/gpio/gpio13/value

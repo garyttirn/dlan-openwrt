@@ -137,8 +137,6 @@ openwrt-dlan-plc-ath79-generic-devolo_dlan-pro-1200plus-ac-squashfs-sysupgrade.b
 
 More the instructions in README.md inside the dlan-fw package of this repository about using the PLC interface.
 
-### Build the OpenWRT image using imagebuilder
-
 ## License
 
 See individual packages.

@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dlan-fw
 PKG_VERSION:=1.3
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_LICENSE:=devolo QCA
 
@@ -32,7 +32,7 @@ define Package/dlan-plc
   TITLE:=PLC runtime support for devolo dLAN devices
   DEPENDS:=+open-plc-utils +open-plc-utils-chkpib +open-plc-utils-getpib \
 	   +open-plc-utils-modpib +open-plc-utils-setpib +open-plc-utils-hpavkey \
-	   +open-plc-utils-plctool +kmod-br-netfilter
+	   +open-plc-utils-plctool +kmod-br-netfilter +kmod-nft-bridge
 endef
 
 define Package/dlan-plc/conffiles

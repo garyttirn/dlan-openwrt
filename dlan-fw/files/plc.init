@@ -42,17 +42,20 @@ set_ebtables() {
 
     eth_mac=$(cat /sys/class/net/$PLCIF/address)
 
-    ebtables -t broute -N plc -P RETURN
-    ebtables -t broute -I BROUTING -p 0x88e1 -j plc
-
-    ebtables -t broute -A plc -s 00:B0:52:00:00:01 -j DROP
-    ebtables -t broute -A plc -s $dlan_mac -d Broadcast -j DROP
-    ebtables -t broute -A plc -d $eth_mac -j DROP
+    #missing nft broute workaround, seems to work only if plc nterface is set to br-lan in config
+    nft create table bridge plc-bridge
+    nft create chain bridge plc-bridge brouting '{ type filter hook prerouting priority -500; policy accept; }'
+    nft create chain bridge plc-bridge plc
+    nft add rule bridge plc-bridge brouting ether type 0x88e1 jump plc
+    nft add rule bridge plc-bridge plc ether saddr 00:B0:52:00:00:01 meta pkttype set host
+    nft add rule bridge plc-bridge plc ether saddr $dlan_mac ether daddr FF:FF:FF:FF:FF:FF meta pkttype set host
+    nft add rule bridge plc-bridge plc ether daddr $eth_mac meta pkttype set host
+    nft add rule bridge plc-bridge plc return
 }
 
 reset_ebtables() {
-    ebtables -t broute -D BROUTING -p 0x88e1 -j plc 2>/dev/null
-    ebtables -t broute -X plc 2>/dev/null
+    nft flush ruleset 2>/dev/null
+    nft delete table bridge plc-bridge 2>/dev/null
 }
 
 set_dak()

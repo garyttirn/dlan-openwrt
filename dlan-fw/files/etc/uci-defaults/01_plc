@@ -15,7 +15,7 @@ board=$(board_name)
 case "$board" in
     devolo,dlan-pro-1200plus-ac)
         uci set plc.plc.disabled=0
-        uci set plc.plc.interface=eth0.1
+        uci set plc.plc.interface=br-lan
         uci set plc.plc.individual_nmk=1
         ;;
     *)

@@ -28,8 +28,8 @@ logger() {
   command logger -t plc "$@"
 }
 
-set_ebtables() {
-  reset_ebtables
+set_nftables() {
+  reset_nftables
 
   local PIB=/lib/firmware/plc/user.pib
 
@@ -42,7 +42,7 @@ set_ebtables() {
 
   eth_mac=$(cat /sys/class/net/$PLCIF/address)
 
-  #missing nft broute workaround, seems to work only if plc nterface is set to br-lan in config
+  #missing nft broute workaround, seems to work only if plc interface is set to a bridge in config
   nft create table bridge plc-bridge
   nft create chain bridge plc-bridge brouting '{ type filter hook prerouting priority -500; policy accept; }'
   nft create chain bridge plc-bridge plc
@@ -53,8 +53,7 @@ set_ebtables() {
   nft add rule bridge plc-bridge plc return
 }
 
-reset_ebtables() {
-  nft flush ruleset 2>/dev/null
+reset_nftables() {
   nft delete table bridge plc-bridge 2>/dev/null
 }
 
@@ -202,7 +201,7 @@ stop_service() {
     led_set_attr "white:dlan" inverted 0
     ;;
   esac
-  reset_ebtables
+  reset_nftables
 }
 
 start_service() {
@@ -213,7 +212,7 @@ start_service() {
     return 1
   }
   set_user_pib
-  set_ebtables
+  set_nftables
   logger "start PLC"
   activate
 }

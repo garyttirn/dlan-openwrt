@@ -5,7 +5,9 @@ https://github.com/openwrt/openwrt/commit/624b85e646328c5f4ff271e6cf0edc5923d40c
 
 It contains the tools for the Powerline (PLC) interface of devolo dLAN devices.
 
-code with tag openwrt-21.02 will work for openwrt 21.02 with ebtables, master works with openwrt 22.03 and fw4 and netfilter
+code with tag openwrt-21.02 will work for openwrt 21.02 with ebtables, master works with openwrt 22.03 and fw4 and netfilter.
+
+openwrt 22.03 and fw4 will only work if plc-tools are used on br-lan interface.
 
 It is different from [the original dlan-openwrt feed](https://github.com/devolo/dlan-openwrt) as it doesn't need the setsid and works with normal openWRT images.
 So far it is unknown if there is any issues due to not using setsid as normal operations seems not to need it,

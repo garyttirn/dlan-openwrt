@@ -106,7 +106,7 @@ Restart PLC interface
 root@OpenWrt:~# /etc/init.d/plc restart
 ```
 
-Check PLC network :
+Check PLC network (openwrt 22.03 and fw4 will only work if plctool is used on br-lan interface instead of eth) :
 
 ```
 root@OpenWrt:~# plctool -i eth0.1 -m all 

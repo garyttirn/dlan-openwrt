@@ -10,6 +10,30 @@ Device | Required PLC firmware package
 ---|---
 dLAN pro 1200+ WiFi ac|dlan-fw-pro-1200plus-ac
 
+Vanilla OpenWRT installation adds two VLANs to eth0 and enables VLAN tagging.
+It needs to be removed to enable PLC interface.
+
+This is the correct configuration for /etc/config/network 
+<pre>
+	config device
+	option name 'br-lan'
+	option type 'bridge'
+	list ports 'eth0'
+
+config switch
+	option name 'switch0'
+	option reset '1'
+	option enable_vlan '0'
+
+config switch_vlan
+	option device 'switch0'
+	option vlan '1'
+	option ports '2 3 4 0'
+</pre>
+
+After that the network setting shoud look like this :
+![Luci view of all ports being untagged in VLAN 1](https://private-user-images.githubusercontent.com/60613994/364025756-194f02d8-3898-468a-b01c-05f82b1d2a43.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjU1OTQ0MTAsIm5iZiI6MTcyNTU5NDExMCwicGF0aCI6Ii82MDYxMzk5NC8zNjQwMjU3NTYtMTk0ZjAyZDgtMzg5OC00NjhhLWIwMWMtMDVmODJiMWQyYTQzLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDA5MDYlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQwOTA2VDAzNDE1MFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWJjZTI1MmFmMmYwNzg3ZDRmYWEyMWJjZTQ2OTYzMTA0NTlkNzlkMTlhMjExNTZmZjM1ODNlMmJkNTE5YzhhYmQmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.K7DMEpI7LWif9Rai2MjmbmgBWTp1LFNsNrrubCzTa0o)
+
 After installing the new firmware packages use the init script ```/etc/init.d/plc``` to
 start or stop the PLC interface. By default its enabled to be started automatically
 at boot time. To disable it permanently call ```/etc/init.d/plc disable```,

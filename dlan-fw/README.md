@@ -32,7 +32,7 @@ config switch_vlan
 </pre>
 
 After that the network setting shoud look like this :
-![Luci view of all ports being untagged in VLAN 1](https://private-user-images.githubusercontent.com/60613994/364025756-194f02d8-3898-468a-b01c-05f82b1d2a43.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjU2MDE2OTMsIm5iZiI6MTcyNTYwMTM5MywicGF0aCI6Ii82MDYxMzk5NC8zNjQwMjU3NTYtMTk0ZjAyZDgtMzg5OC00NjhhLWIwMWMtMDVmODJiMWQyYTQzLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDA5MDYlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQwOTA2VDA1NDMxM1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTMwYTE1NDcyOWY0NmU3YjExNzQ0MGMzOWJjOTEyMThmNDZmYTAwY2ExODZkMjM4ZjVlM2EwZGRhODAxOTVmYmYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.4xt2GsqwH_J6w6DGXywNBEsbkSnTig9oTK8I44PdyBs)
+![Luci view of all ports being untagged in VLAN 1](img/switch.png)
 
 After installing the new firmware packages use the init script ```/etc/init.d/plc``` to
 start or stop the PLC interface. By default its enabled to be started automatically

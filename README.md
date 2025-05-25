@@ -5,9 +5,10 @@ https://github.com/openwrt/openwrt/commit/624b85e646328c5f4ff271e6cf0edc5923d40c
 
 It contains the tools for the Powerline (PLC) interface of devolo dLAN devices.
 
-code with tag openwrt-21.02 will work for openwrt 21.02 with ebtables, master works with openwrt 22.03/23.5 and fw4 and netfilter.
+code with tag openwrt-21.02 will work for openwrt 21.02 with ebtables, tag openwrt-22.03 works with openwrt 22.03/23.05 and fw4 and netfilter.
+tag openwrt-24.10 and master requires OpenWRT 24.10 due to GPIO base change.
 
-openwrt 22.03/23.05 and fw4 will only work if plc-tools are used on br-lan interface.
+openwrt with fw4 and netfilter will only work if plc-tools are used on br-lan interface.
 
 It is different from [the original dlan-openwrt feed](https://github.com/devolo/dlan-openwrt) as it doesn't need the setsid and works with normal openWRT images.
 So far it is unknown if there is any issues due to not using setsid as normal operations seems not to need it,
@@ -18,22 +19,23 @@ These files must be acquired from the official Develo firmware package and only 
 
 ## Usage
 
-### Build the dLAN firmware packages for OpenWRT
+### Build the dLAN firmware packages for OpenWRT using OpenWRT SDK
 This repository is intended to be layered on-top of an OpenWrt buildroot. If you do not have an OpenWrt buildroot installed, see the documentation at: [OpenWrt Buildroot – Installation](http://wiki.openwrt.org/doc/howto/buildroot.exigence) on the OpenWrt support site.
 
 Debian or ubuntu based Linux is assumed to be used for building the dLAN package.
 
-To add the dLAN package to the buildroot add the following line to feeds.conf.default (or feeds.conf if it exists):
+Build the package using a OpenWRT SDK, example is for 24.10.1 build on Ubuntu 24.04.2
 ```
-git clone https://github.com/openwrt/openwrt.git
-cd openwrt/
+wget https://downloads.openwrt.org/releases/24.10.1/targets/ath79/generic/openwrt-sdk-24.10.1-ath79-generic_gcc-13.3.0_musl.Linux-x86_64.tar.zst
+tar xvf openwrt-sdk-24.10.1-ath79-generic_gcc-13.3.0_musl.Linux-x86_64.tar.zst
+cd openwrt-sdk-24.10.1-ath79-generic_gcc-13.3.0_musl.Linux-x86_64/
 echo "src-git dlan https://github.com/garyttirn/dlan-openwrt.git" >> feeds.conf.default 
 ```
 
 To install all package definitions, run:
 ```
-./scripts/feeds update -a
-./scripts/feeds install -a
+./scripts/feeds update
+./scripts/feeds install dlan-fw
 ```
 
 The procedure for getting the PLC firmware and pib-file is based on [Andre Borie's script](https://bitbucket.org/Rjevski/dlan-1200-ac-firmware-downloader/src/master/)
@@ -78,24 +80,38 @@ bin  MAC-7500-v2.8.0-01-NW6__-X-CS.nvm  qca7500-pib15-devolo-mt2910.pib
 ```
 
 Build the dlan firmware and tools packages
-```
-make download
-make prereq
-make prepare
-```
 
 Make sure to build for DEVICE devolo_dlan-pro-1200plus-ac and include packages dlan-fw-pro-1200plus-ac and dlan-plc
 ```
 echo -e "CONFIG_TARGET_ath79_generic_DEVICE_devolo_dlan-pro-1200plus-ac=y\n
 CONFIG_TARGET_PROFILE="DEVICE_devolo_dlan-pro-1200plus-ac"\n
+CONFIG_IN_SDK=y\n
+CONFIG_HAVE_DOT_CONFIG=y\n
+CONFIG_ALL_NONSHARED=n\n
+CONFIG_ALL_KMODS=n\n
+CONFIG_ALL=n\n
+CONFIG_MODULES=n\n
+CONFIG_SIGNED_PACKAGES=n\n
+CONFIG_AUTOREBUILD=n\n
 CONFIG_FEED_dlan=y\n
 CONFIG_PACKAGE_dlan-fw-pro-1200plus-ac=m\n
-CONFIG_PACKAGE_dlan-plc=y" >> .config
+CONFIG_PACKAGE_dlan-plc=y" > .config
 
 make package/dlan-fw/{clean,compile}
 
+#
+# No change to .config
+#
+ make[1] package/dlan-fw/compile
+ make[2] -C package/kernel/linux clean-build
+ make[2] -C package/kernel/linux compile
+ make[2] -C package/toolchain clean-build
+ make[2] -C package/toolchain compile
+ make[2] -C feeds/dlan/dlan-fw clean-build
+ make[2] -C feeds/dlan/dlan-fw compile
+
 ls bin/packages/mips_24kc/dlan
-dlan-fw-pro-1200plus-ac_1.2-1_mips_24kc.ipk  dlan-plc_1.2-1_mips_24kc.ipk  Packages  Packages.gz  Packages.manifest
+dlan-fw-pro-1200plus-ac_1.4-r1_mips_24kc.ipk  dlan-plc_1.4-r1_mips_24kc.ipk  tmp
 ```
 
 Now these packages can be used for subsequent OpenWRT image builds using ImageBuilder making it unneccessary to build the entire OpenWRT image from sources everytime.
@@ -116,11 +132,10 @@ make clean
 Prepare firmware packages
 ```
 mkdir -p packages
-cp ../openwrt/bin/packages/mips_24kc/dlan/{dlan-fw-pro-1200plus-ac_1.2-1_mips_24kc.ipk,dlan-plc_1.2-1_mips_24kc.ipk} packages
+cp ../openwrt/bin/packages/mips_24kc/dlan/{dlan-fw-pro-1200plus-ac_1.4-r1_mips_24kc.ipk,dlan-plc_1.4-r1_mips_24kc.ipk} packages
 
 ls packages/
-dlan-fw-pro-1200plus-ac_1.2-1_mips_24kc.ipk  dlan-plc_1.2-1_mips_24kc.ipk
-
+dlan-fw-pro-1200plus-ac_1.4-r1_mips_24kc.ipk  dlan-plc_1.4-r1_mips_24kc.ipk
 ```
 
 Add PLC files as custom

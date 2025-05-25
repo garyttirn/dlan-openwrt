@@ -3,12 +3,13 @@
 . /lib/functions.sh
 
 board=$(board_name)
+gpio=525
 
 case "$board" in
 devolo,dlan-pro-1200plus-ac)
-	echo 0 > /sys/class/gpio/gpio13/value
+	echo 0 > /sys/class/gpio/gpio${gpio}/value
 	sleep 1
-	echo 1 > /sys/class/gpio/gpio13/value
+	echo 1 > /sys/class/gpio/gpio${gpio}/value
 	;;
 
 *)

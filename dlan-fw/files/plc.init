@@ -1,6 +1,11 @@
 #!/bin/sh /etc/rc.common
 
 # we must run after S95done because jffs2 overlay must be ready for writing to /lib/firmware/plc
+# GPIO base has changed in OpenWRT 24.10
+# cat /sys/class/gpio/gpiochip*/base
+# 512
+# PLC GPIO is then base+13 = 525
+
 START=96
 STOP=10
 
@@ -10,6 +15,7 @@ USE_PROCD=1
 . /lib/functions/leds.sh
 
 board=$(board_name)
+gpio=525
 
 . /lib/firmware/plc/$board/fwconfig
 
@@ -121,7 +127,8 @@ set_user_pib() {
 do_gpios() {
   case "$board" in
   devolo,dlan-pro-1200plus-ac)
-    echo 1 >/sys/class/gpio/gpio13/value
+    echo "$gpio" > /sys/class/gpio/export
+    echo 1 >/sys/class/gpio/gpio${gpio}/value
     led_set_attr "white:dlan" inverted 1
     ;;
   esac
@@ -197,7 +204,7 @@ stop_service() {
 
     # reinstall normal led trigger potentially messed up by standby
     (. /etc/init.d/led && config_load system && load_led led_plcw)
-    echo 0 >/sys/class/gpio/gpio13/value
+    echo 0 >/sys/class/gpio/gpio${gpio}/value
     led_set_attr "white:dlan" inverted 0
     ;;
   esac
@@ -263,7 +270,7 @@ standby() {
       led_timer "$(uci_get system led_plcw sysfs)" 500 59500
     }
     # standby on
-    echo 0 >/sys/class/gpio/gpio13/value
+    echo 0 >/sys/class/gpio/gpio${gpio}/value
     led_set_attr "white:dlan" inverted 0
     ;;
   esac
@@ -281,7 +288,7 @@ normal() {
       (. /etc/init.d/led && config_load system && load_led led_plcw)
     }
     # standby off
-    echo 1 >/sys/class/gpio/gpio13/value
+    echo 1 >/sys/class/gpio/gpio${gpio}/value
     led_set_attr "white:dlan" inverted 1
     ;;
   esac

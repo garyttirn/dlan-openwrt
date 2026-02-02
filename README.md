@@ -6,7 +6,7 @@ https://github.com/openwrt/openwrt/commit/624b85e646328c5f4ff271e6cf0edc5923d40c
 It contains the tools for the Powerline (PLC) interface of devolo dLAN devices.
 
 code with tag openwrt-21.02 will work for openwrt 21.02 with ebtables, tag openwrt-22.03 works with openwrt 22.03/23.05 and fw4 and netfilter.
-tag openwrt-24.10 and master requires OpenWRT 24.10 due to GPIO base change.
+tag openwrt-24.10 and master requires OpenWRT 24.10 or 25.12 due to GPIO base change.
 
 openwrt with fw4 and netfilter will only work if plc-tools are used on br-lan interface.
 
@@ -24,11 +24,10 @@ This repository is intended to be layered on-top of an OpenWrt buildroot. If you
 
 Debian or ubuntu based Linux is assumed to be used for building the dLAN package.
 
-Build the package using a OpenWRT SDK, example is for 24.10.1 build on Ubuntu 24.04.2
+Build the package using a OpenWRT SDK, example is for 25.12.0-rc4 build on Ubuntu 24.04.3
 ```
-wget https://downloads.openwrt.org/releases/24.10.1/targets/ath79/generic/openwrt-sdk-24.10.1-ath79-generic_gcc-13.3.0_musl.Linux-x86_64.tar.zst
-tar xvf openwrt-sdk-24.10.1-ath79-generic_gcc-13.3.0_musl.Linux-x86_64.tar.zst
-cd openwrt-sdk-24.10.1-ath79-generic_gcc-13.3.0_musl.Linux-x86_64/
+wget "https://downloads.openwrt.org/releases/25.12.0-rc4/targets/ath79/generic/openwrt-sdk-25.12.0-rc4-ath79-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst"
+cd openwrt-sdk-25.12.0-rc4-ath79-generic_gcc-14.3.0_musl.Linux-x86_64/
 echo "src-git dlan https://github.com/garyttirn/dlan-openwrt.git" >> feeds.conf.default 
 ```
 
@@ -111,15 +110,17 @@ make package/dlan-fw/{clean,compile}
  make[2] -C feeds/dlan/dlan-fw compile
 
 ls bin/packages/mips_24kc/dlan
-dlan-fw-pro-1200plus-ac_1.4-r1_mips_24kc.ipk  dlan-plc_1.4-r1_mips_24kc.ipk  tmp
+dlan-fw-pro-1200plus-ac-1.5-r1.apk  dlan-plc-1.5-r1.apk
 ```
 
 Now these packages can be used for subsequent OpenWRT image builds using ImageBuilder making it unneccessary to build the entire OpenWRT image from sources everytime.
-Package build for openwrt 22.03 will work with 23.05 also
+Package build for openwrt 22.03 will work with 23.05 also, 24.10 and 25.12 both require rebuilding.
 
 ### Build the OpenWRT image with dlan-plc and dlan-fw-packages using ImageBuilder
 
 Download ImageBuilder
+
+Use snapshot as below or stable release
 ```
 curl -o openwrt-imagebuilder-ath79-generic.Linux-x86_64.tar.xz https://downloads.openwrt.org/snapshots/targets/ath79/generic/openwrt-imagebuilder-ath79-generic.Linux-x86_64.tar.xz
 
@@ -132,13 +133,13 @@ make clean
 Prepare firmware packages
 ```
 mkdir -p packages
-cp ../openwrt/bin/packages/mips_24kc/dlan/{dlan-fw-pro-1200plus-ac_1.4-r1_mips_24kc.ipk,dlan-plc_1.4-r1_mips_24kc.ipk} packages
+cp ../openwrt/bin/packages/mips_24kc/dlan/*.apk packages
 
 ls packages/
-dlan-fw-pro-1200plus-ac_1.4-r1_mips_24kc.ipk  dlan-plc_1.4-r1_mips_24kc.ipk
+dlan-fw-pro-1200plus-ac-1.5-r1.apk dlan-plc-1.5-r1.apk 
 ```
 
-Add PLC files as custom
+Add PLC files as custom for openwrt < 25.12. APK packges do not need this
 ```
 sed -i 's/^# src custom.*$/src\/gz custom file:packages/' repositories.conf
 ```
